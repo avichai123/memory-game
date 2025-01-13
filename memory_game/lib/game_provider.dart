@@ -37,6 +37,15 @@ class GameProvider extends ChangeNotifier {
     checkStatusGame();
   }
 
+  void resetCards() {
+    for (final card in arr) {
+      card.isFront = false;
+      card.isComplete = false;
+    }
+    isFirstTime = true; // Reset the game state
+    notifyListeners(); // Notify listeners after resetting
+  }
+
   void checkIF2isFrontExist(String text) {
     int counterSameCardsOpen = 0;
 
@@ -102,7 +111,21 @@ class GameProvider extends ChangeNotifier {
         columns.add(const SizedBox(height: 15));
       }
     }
-
+    columns.add(
+      SizedBox(height: 20), // Add spacing before the button
+    );
+    columns.add(
+      Center(
+        child: ElevatedButton(
+          onPressed: () {
+            resetCards();
+            updateShuffleArrState();
+            print('Reset clicked!');
+          },
+          child: const Text('Restart Game'),
+        ),
+      ),
+    );
     return columns;
   }
 }
