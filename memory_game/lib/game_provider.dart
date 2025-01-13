@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:memory_game/card_item.dart';
 import 'package:memory_game/flipping_card.dart';
@@ -15,6 +16,35 @@ class GameProvider extends ChangeNotifier {
     CardItem(text: "C", color: Colors.green, index: 7),
     CardItem(text: "D", color: Colors.blue, index: 8),
   ];
+
+  void addData(json) {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('example');
+    collection.add(json);
+    // collection.add({'name': 'John', 'age': '30'});
+  }
+
+  void getData() async {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('example');
+    final snapshot = await collection.get();
+    // final docs = snapshot.docs.map((doc) => doc.data()).toList();
+    snapshot.docs.forEach((doc) {
+      print(doc.id);
+      print(doc.data());
+    });
+  }
+
+  void updateData(id, newValue) async {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('example');
+    try {
+      await collection.doc(id).update(newValue);
+    } catch (e) {
+      print(e);
+    }
+    print(id + " Updated");
+  }
 
   void updateShuffleArrState() {
     if (isFirstTime) {
@@ -79,6 +109,7 @@ class GameProvider extends ChangeNotifier {
     int completedCards = arr.where((e) => e.isComplete).length;
 
     if (completedCards == arr.length) {
+      addData();
       print("Game over you win :)");
     }
     notifyListeners(); // Notify listeners after checking the game status
